@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,11 +15,29 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
-import com.celaandroid_zidai.activity.OneActivity;
+import com.celaandroid_zidai.activitycela.OneActivity;
+import com.celaandroid_zidai.activityfragment.HomePage;
+import com.celaandroid_zidai.activityfragment.NotLoggedIn;
+import com.celaandroid_zidai.activityfragment.TheHeadlines;
+import com.celaandroid_zidai.activityfragment.Videos;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private FragmentManager fm;
+    private RadioGroup rg;
+    private List<Fragment> list;
+    private HomePage hp;
+    private Videos vd;
+    private TheHeadlines th;
+    private NotLoggedIn nli;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +75,47 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        rg = (RadioGroup) findViewById(R.id.radioGroup);
+        addFragment();//添加数据
+        changeFragment();//改变数据
+    }
 
+    private void changeFragment() {
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton rb = (RadioButton) group.findViewById(checkedId);
+                int tag = Integer.parseInt(rb.getTag().toString());
+                FragmentTransaction transaction2 = fm.beginTransaction();
+                for (int i = 0; i < list.size(); i++) {
+                    if (tag == i) {
+                        transaction2.show(list.get(i));
+                    } else {
+                        transaction2.hide(list.get(i));
+                    }
+                }
+                transaction2.commit();
+            }
+        });
+    }
+    private void addFragment() {
+        list = new ArrayList<>();
+        fm = getSupportFragmentManager();
+        hp = new HomePage();
+        vd = new Videos();
+        th = new TheHeadlines();
+        nli = new NotLoggedIn();
+        list.add(hp);
+        list.add(vd);
+        list.add(th);
+        list.add(nli);
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.add(R.id.frameLayout, list.get(0));
+        transaction.add(R.id.frameLayout, list.get(1));
+        transaction.add(R.id.frameLayout, list.get(2));
+        transaction.add(R.id.frameLayout, list.get(3));
+        transaction.show(list.get(0)).hide(list.get(1)).hide(list.get(2)).hide(list.get(3));
+        transaction.commit();
     }
 
     @Override
@@ -111,7 +172,8 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.shezhi) {
 
-        } else if (id == R.id.yejian) {//切换夜间模式
+        } else if (id == R.id.yejian) {
+            //切换夜间模式
             SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
             if (sp.getBoolean("isNight", false)) {
                 sp.edit().putBoolean("isNight", false).commit();
