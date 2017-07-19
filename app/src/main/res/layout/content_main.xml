@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.celaandroid_zidai.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/main_radioButton_tab1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:checked="true"
+            android:drawableTop="@drawable/selector1"
+            android:gravity="center"
+            android:tag="0"
+            android:text="首页"
+            android:textColor="@drawable/selector_clor2"
+            android:textSize="15sp"/>
+
+        <RadioButton
+            android:id="@+id/main_radioButton_tab2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector2"
+            android:gravity="center"
+            android:tag="1"
+            android:text="视频"
+            android:textColor="@drawable/selector_clor2"
+            android:textSize="15sp"/>
+
+        <RadioButton
+            android:id="@+id/main_radioButton_tab3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector3"
+            android:gravity="center"
+            android:tag="2"
+            android:text="微头条"
+            android:textColor="@drawable/selector_clor2"
+            android:textSize="15sp"/>
+
+        <RadioButton
+            android:id="@+id/main_radioButton_tab4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector4"
+            android:gravity="center"
+            android:tag="3"
+            android:text="未登录"
+            android:textColor="@drawable/selector_clor2"
+            android:textSize="15sp"/>
+    </RadioGroup>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/radioGroup"></FrameLayout>
+
+</RelativeLayout>
