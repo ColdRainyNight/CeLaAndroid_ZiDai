@@ -1,7 +1,7 @@
 package com.celaandroid_zidai;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -11,18 +11,24 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.celaandroid_zidai.activitycela.OneActivity;
 import com.celaandroid_zidai.activityfragment.HomePage;
 import com.celaandroid_zidai.activityfragment.NotLoggedIn;
 import com.celaandroid_zidai.activityfragment.TheHeadlines;
 import com.celaandroid_zidai.activityfragment.Videos;
+import com.celaandroid_zidai.app.MyApp;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +44,29 @@ public class MainActivity extends AppCompatActivity
     private TheHeadlines th;
     private NotLoggedIn nli;
 
+    private ImageView userPhoto;
+    private TextView userName, userCity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SystemBarTintManager tintManager = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            tintManager = new SystemBarTintManager(this);
+            tintManager.setStatusBarTintColor(getResources().getColor(R.color.colorPrimary));
+            tintManager.setStatusBarTintEnabled(true);
+        }
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+       // toolbar.setTitle("主页");
+        toolbar.setSubtitle("Su title");//给状态栏加一个副标题
         setSupportActionBar(toolbar);
+        setTitle("主页面");//改变状态栏名称
 
     /*  // 设置邮件可以点击切换日夜间模式
        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -78,6 +100,33 @@ public class MainActivity extends AppCompatActivity
         rg = (RadioGroup) findViewById(R.id.radioGroup);
         addFragment();//添加数据
         changeFragment();//改变数据
+
+        View headerView = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        userName = (TextView) headerView.findViewById(R.id.name);
+        userPhoto = (ImageView) headerView.findViewById(R.id.image);
+        userCity = (TextView) headerView.findViewById(R.id.city);
+
+        userPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                QQLogin.login(MainActivity.this, new QQLogin.QQLoginCallBack() {
+                    @Override
+                    public void success(User user) {
+
+                        Glide.with(MainActivity.this).load(user.getUserPhotoUrl()).into(userPhoto);
+                        userName.setText(user.getUserName());
+                        userCity.setText(user.getCity());
+
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        MyApp.getInstance().getUMShareAPI().onActivityResult(requestCode, resultCode, data);
     }
 
     private void changeFragment() {
@@ -98,6 +147,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
     private void addFragment() {
         list = new ArrayList<>();
         fm = getSupportFragmentManager();
@@ -170,22 +220,28 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_send) {
 
-        } else if (id == R.id.shezhi) {
+        } else if (id == R.id.nav_exit) {
+
+            QQLogin.exitLogin(this, new QQLogin.QQExitCallBack() {
+                @Override
+                public void exit() {
+                    userPhoto.setImageResource(R.mipmap.ic_launcher);
+                    userName.setText("");
+                    userCity.setText("");
+                }
+            });
 
         } else if (id == R.id.yejian) {
-            //切换夜间模式
-            SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-            if (sp.getBoolean("isNight", false)) {
-                sp.edit().putBoolean("isNight", false).commit();
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            } else {
-                sp.edit().putBoolean("isNight", true).commit();
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            }
-            recreate();
+            //调用DayNigthUtils类
+            DayNigthUtils.changeDayNight(MainActivity.this);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 }
+
+
+// SystemBarTintManager tintManager = new SystemBarTintManager(this);
+//        tintManager.setStatusBarTintEnabled(true);
+//        tintManager.setNavigationBarTintEnabled(true);
